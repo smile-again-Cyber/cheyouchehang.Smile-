@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>车队招募</title>
+<style>
+  body { font-family: -apple-system, sans-serif; background:#0f172a; color:#e2e8f0; display:flex; justify-content:center; padding:40px 12px; }
+  .card { background:#1e293b; border-radius:16px; padding:32px; max-width:480px; width:100%; }
+  h2 { margin-top:0; }
+  button { background:#38bdf8; color:#0f172a; border:none; border-radius:8px; padding:10px 24px; font-size:15px; cursor:pointer; margin:6px 6px 0 0; }
+  button.secondary { background:#334155; color:#e2e8f0; }
+  input[type=text], select {
+    width:100%; padding:10px; border-radius:8px; border:1px solid #334155;
+    background:#0f172a; color:#e2e8f0; font-size:15px; margin-top:8px;
+  }
+  .step { display:none; }
+  .step.active { display:block; }
+  .nav { margin-top:20px; }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <!-- Step 0：车头 / 搭车 -->
+  <div id="step0" class="step active">
+    <h2>🚗 你要当车头还是搭车？</h2>
+    <button onclick="choose('车头')">当车头</button>
+    <button onclick="choose('搭车')">搭车</button>
+  </div>
+
+  <!-- Step 1：仙墟几阶（仅车头） -->
+  <div id="step1" class="step">
+    <h2>⚔️ 仙墟可以打几阶？</h2>
+    <input type="text" id="xianxu" placeholder="比如：能打 3 阶 / 只敢 1 阶">
+    <div class="nav">
+      <button onclick="next(2)">下一步</button>
+      <button class="secondary" onclick="back(0)">返回</button>
+    </div>
+  </div>
+
+  <!-- Step 2：选车友（车头分支继续） -->
+  <div id="step2" class="step">
+    <h2>🤝 请选择你的车友</h2>
+    <p style="color:#94a3b8;font-size:13px">（这里先留静态选项，后面可以换成动态拉取）</p>
+    <select id="cheyou">
+      <option value="">-- 请选择 --</option>
+      <option>张三</option>
+      <option>李四</option>
+      <option>王五</option>
+    </select>
+    <div class="nav">
+      <button onclick="submitForm()">提交</button>
+      <button class="secondary" onclick="back(1)">返回</button>
+    </div>
+  </div>
+
+  <!-- 搭车分支的口子先留着 -->
+  <div id="stepPassenger" class="step">
+    <h2>🙋 搭车模式（你后面补选项）</h2>
+    <div class="nav">
+      <button class="secondary" onclick="back(0)">返回</button>
+    </div>
+  </div>
+
+  <!-- 结果 -->
+  <div id="result" class="step">
+    <h2>✅ 提交成功</h2>
+    <pre id="output" style="background:#0f172a;padding:12px;border-radius:8px;overflow-x:auto"></pre>
+    <div class="nav"><button onclick="location.reload()">再填一份</button></div>
+  </div>
+
+</div>
+
+<script>
+let role = '';
+
+function choose(r) {
+  role = r;
+  document.getElementById('step0').classList.remove('active');
+  if (r === '车头') {
+    document.getElementById('step1').classList.add('active');
+  } else {
+    document.getElementById('stepPassenger').classList.add('active');
+  }
+}
+
+function next(n) {
+  // 简化：当前只在 step1→step2 有用
+  document.getElementById('step1').classList.remove('active');
+  document.getElementById('step' + n).classList.add('active');
+}
+
+function back(n) {
+  // 粗暴重载当前可见的
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+}
+
+function submitForm() {
+  const data = {
+    身份: role,
+    仙墟几阶: document.getElementById('xianxu').value,
+    车友: document.getElementById('cheyou').value,
+  };
+  console.log('提交的数据:', data);
+  // TODO: 发到后端 / 飞书 / 表格，我帮你接
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+  document.getElementById('result').classList.add('active');
+}
+</script>
+</body>
+</html>
